@@ -1,0 +1,52 @@
+# ADR Configuration — Stochastic Harvard Architecture
+# Defines domain numbering and validation rules.
+# Used by: docs/scripts/adr
+
+project_name: Stochastic Harvard Architecture
+
+# Domain Number Series
+domains:
+  core:
+    range: [100, 199]
+    name: Core Architecture
+    description: Fundamental SHA components, bus architecture, memory model
+    folder: core
+
+  bus:
+    range: [200, 299]
+    name: Bus Protocols
+    description: I-Bus, D-Bus, X-Bus protocol design, bus controller, verification gates
+    folder: bus
+
+  security:
+    range: [300, 399]
+    name: Security
+    description: Threat model, isolation guarantees, trust boundaries, residual risks
+    folder: security
+
+  implementation:
+    range: [400, 499]
+    name: Implementation
+    description: Middleware, API-level, model architecture, browser runtime strategies
+    folder: implementation
+
+# Valid ADR statuses
+statuses:
+  - Draft
+  - Proposed
+  - Accepted
+  - Superseded
+  - Deprecated
+
+# Default values for new ADRs
+defaults:
+  deciders: [aaronsb]
+  status: Draft
+
+# Legacy ADR range (pre-domain numbering)
+legacy:
+  range: [1, 99]
+  label: "Legacy"
+
+# Viewer command
+viewer: cat {file}
