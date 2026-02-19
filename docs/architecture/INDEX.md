@@ -36,3 +36,4 @@ _Threat model, isolation guarantees, trust boundaries, residual risks_
 |-----|-------|--------|
 | [ADR-300](./security/ADR-300-cu-influence-mitigation-strategies.md) | CU Influence Mitigation Strategies | Draft |
 | [ADR-301](./security/ADR-301-bus-supervisor-model-for-dispatch-verification.md) | Bus Supervisor Model for Dispatch Verification | Draft |
+| [ADR-302](./security/ADR-302-adaptive-supervisor-with-calibrated-trust-scoring.md) | Adaptive Supervisor with Calibrated Trust Scoring | Draft |
