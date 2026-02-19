@@ -35,4 +35,4 @@ This is an honest scope boundary:
 - SHA **does not** require model architecture changes (though it can benefit from them — see [§8.2](08-implementation.md), [§8.3](08-implementation.md)).
 - SHA **does not** eliminate the fundamental stochasticity of inference. It manages it.
 
-The analogy to hardware is precise: CPU architects do not redesign the transistor. They design the system around the transistor — buses, caches, branch predictors, memory controllers — to get reliable, secure, observable computation from an imperfect physical substrate. SHA does the same for an imperfect stochastic substrate.
+The analogy to hardware is precise: CPU architects do not redesign the transistor. They change the arrangement of transistors — buses, caches, branch predictors, memory controllers — to get reliable, secure, observable computation from an imperfect physical substrate. Same transistor, different topology, different system-level guarantees. SHA does the same for an imperfect stochastic substrate.
