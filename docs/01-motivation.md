@@ -19,3 +19,20 @@ This document proposes applying the same structural separation to AI agent syste
 ## 1.3 Why "Stochastic"
 
 Traditional Harvard architecture assumes a deterministic processor. The control unit fetches an instruction and executes it identically every time. This specification describes a system where the primary execution unit (the inference engine) is **fundamentally stochastic** — the same inputs may produce different outputs across invocations. This has cascading implications for scheduling, verification, error handling, and system design that differ from both traditional computing and traditional Harvard architecture.
+
+## 1.4 What This Architecture Is and Is Not
+
+**The LLM is the CPU.** This architecture treats the inference engine as a fixed component — a processor with known characteristics, accessed through a defined interface (the API), whose internal operation is not under our control. We do not propose changes to how models work. The inference is what it is: a stochastic function from input tokens to output tokens, delivered by remote APIs or local runtimes, with the characteristics and limitations of the current generation of language models.
+
+**The entire purpose of this architecture is to manage execution around that fixed component.** SHA defines how instructions and data are organized, separated, and composed *before* they reach the model, and how the model's outputs are validated, routed, and constrained *after* they leave. It is a system architecture for the surrounding infrastructure — buses, memory, controllers, verification gates — not a proposal for how the model itself should change.
+
+This is an honest scope boundary:
+
+- SHA **does** define how to prevent untrusted data from being composed into the instruction stream.
+- SHA **does** define how to validate CU outputs against policy before execution.
+- SHA **does** define how to isolate execution environments and enforce least-privilege access.
+- SHA **does not** claim to make the CU more reliable, more aligned, or less susceptible to influence.
+- SHA **does not** require model architecture changes (though it can benefit from them — see [§8.2](08-implementation.md), [§8.3](08-implementation.md)).
+- SHA **does not** eliminate the fundamental stochasticity of inference. It manages it.
+
+The analogy to hardware is precise: CPU architects do not redesign the transistor. They design the system around the transistor — buses, caches, branch predictors, memory controllers — to get reliable, secure, observable computation from an imperfect physical substrate. SHA does the same for an imperfect stochastic substrate.
