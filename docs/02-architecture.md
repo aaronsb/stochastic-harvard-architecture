@@ -41,18 +41,18 @@ The system defines three bus types with distinct access semantics:
 flowchart TD
     subgraph IMEM["INSTRUCTION MEMORY"]
         direction LR
-        SYS["System\nPrompt"]
-        SKILL["Skills\n(loaded)"]
-        POL["Policies\n(rules)"]
-        ECTX["Exec Ctx\n(plans)"]
+        SYS["System<br>Prompt"]
+        SKILL["Skills<br>(loaded)"]
+        POL["Policies<br>(rules)"]
+        ECTX["Exec Ctx<br>(plans)"]
     end
 
     subgraph CU["CONTROL UNITS"]
         direction LR
-        LLM["LLM Core\n(reason)"]
-        DIFF["Diffusion\n(image)"]
-        CODE["Code CU\n(code)"]
-        SPEECH["Speech CU\n(voice)"]
+        LLM["LLM Core<br>(reason)"]
+        DIFF["Diffusion<br>(image)"]
+        CODE["Code CU<br>(code)"]
+        SPEECH["Speech CU<br>(voice)"]
         LLM <-->|"X-Bus"| DIFF
         DIFF <-->|"X-Bus"| CODE
         CODE <-->|"X-Bus"| SPEECH
@@ -61,9 +61,9 @@ flowchart TD
     subgraph DMEM["DATA MEMORY"]
         direction LR
         FILES["Files"]
-        CONV["Conv\nBuffer"]
-        VEC["Vector\nStore"]
-        SCRATCH["Temp\nScratch"]
+        CONV["Conv<br>Buffer"]
+        VEC["Vector<br>Store"]
+        SCRATCH["Temp<br>Scratch"]
     end
 
     subgraph ALU["ALU / COMPUTE"]
@@ -76,10 +76,10 @@ flowchart TD
 
     subgraph IO["I/O CHANNELS"]
         direction LR
-        MSG["Messaging\n(chat/sms)"]
-        WEB["Web\n(browser)"]
-        API["API\n(external)"]
-        HW["Hardware\n(sensors)"]
+        MSG["Messaging<br>(chat/sms)"]
+        WEB["Web<br>(browser)"]
+        API["API<br>(external)"]
+        HW["Hardware<br>(sensors)"]
     end
 
     IMEM -->|"I-Bus (isolated, read-only)"| CU

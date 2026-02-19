@@ -40,12 +40,12 @@ flowchart LR
         GATE["Verification Gate"]
     end
 
-    DP["Danger Pattern\nStore"] -->|"embed + match"| PS
+    DP["Danger Pattern<br>Store"] -->|"embed + match"| PS
     D --> PS
     PS --> AGG
     AGG -->|"median score"| GATE
 
-    OBS["Dispatch Outcome\nObserver"] -->|"pattern updates"| DP
+    OBS["Dispatch Outcome<br>Observer"] -->|"pattern updates"| DP
     GATE -->|"dispatch log"| OBS
 
     style VP fill:none,stroke:#4A5568,stroke-width:2px

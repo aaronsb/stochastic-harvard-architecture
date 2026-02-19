@@ -32,21 +32,21 @@ flowchart LR
         direction TB
         CUA["CU"]
         BCA["Bus Controller"]
-        SPA["Supervisor\nParams"]
+        SPA["Supervisor<br>Params"]
     end
 
     subgraph B["SHA INSTANCE B"]
         direction TB
         CUB["CU"]
         BCB["Bus Controller"]
-        SPB["Supervisor\nParams"]
+        SPB["Supervisor<br>Params"]
     end
 
-    A -->|"admin channel:\nperformance metrics"| B
-    B -->|"admin channel:\nparameter updates"| SPA
+    A -->|"admin channel:<br>performance metrics"| B
+    B -->|"admin channel:<br>parameter updates"| SPA
 
-    B -->|"admin channel:\nperformance metrics"| A
-    A -->|"admin channel:\nparameter updates"| SPB
+    B -->|"admin channel:<br>performance metrics"| A
+    A -->|"admin channel:<br>parameter updates"| SPB
 
     style A fill:#2D7D9A,stroke:#4A5568,color:#FFFFFF
     style CUA fill:#7B2D8E,stroke:#FFFFFF,color:#FFFFFF
