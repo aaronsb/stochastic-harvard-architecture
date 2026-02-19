@@ -120,6 +120,37 @@ The danger pattern store is a new component not cleanly categorized by the exist
 
 This introduces a new category: **infrastructure state** that is neither instruction nor data but is maintained by the deterministic layer for its own operation.
 
+### Out-of-Band Administrative Tuning
+
+The adaptive supervisor runs two optimization loops:
+
+1. **Inner loop (operational, continuous)**: Pattern updates from outcome observation, decay, and median recalibration. This is the self-regulating homeostatic mechanism described above. It runs within the bus architecture's isolation guarantees — no external input, no bus-connected component can influence it.
+
+2. **Outer loop (administrative, periodic)**: An administrator or performance monitoring system adjusts supervisor operating parameters based on aggregate system health metrics. This uses the same out-of-band administrative channel as IMEM-SYS and IMEM-POLICY updates — authenticated, audited, through the firmware update gate.
+
+Tunable parameters available to the outer loop:
+
+| Parameter | Effect | Example |
+|-----------|--------|---------|
+| Escalation thresholds | What median score triggers Level 2+ supervisor | Lower threshold = more cautious, higher latency |
+| Pattern decay rate | How fast unused patterns age out | Faster decay = more adaptive, less historical memory |
+| Recalibration window | How many cycles between baseline resets | Shorter window = faster response to drift, more noise sensitivity |
+| Supervisor instance count | How many parallel Level 0/1 instances run | More instances = better median stability, more compute |
+| Score-to-risk mapping | How median scores map to risk categories | Adjusts the boundary between "proceed" and "escalate" |
+| Outcome observation sensitivity | What counts as a harmful outcome | Broader = more pattern generation, narrower = fewer but higher-quality patterns |
+
+These adjustments are driven by **performance goals** — system-level metrics that balance security against operational efficiency:
+
+- **False positive rate**: Percentage of legitimate dispatches flagged. Too high = operational friction.
+- **Detection rate**: Percentage of actually-harmful dispatches caught. Too low = inadequate protection.
+- **Median dispatch latency**: Time added by the verification pipeline. Reflects bus contention.
+- **Pattern store growth rate**: Indicates whether the inner loop is converging or drifting.
+- **Escalation rate**: Percentage of dispatches routed to expensive Level 2+ supervisors. Reflects tuning efficiency.
+
+The outer loop can optimize for a composite objective — e.g., "minimize false positive rate subject to detection rate > 95% and median latency < 200ms" — and adjust parameters accordingly. This is standard control theory: the inner loop handles fast regulation, the outer loop handles slow optimization toward a target operating point.
+
+**Critical constraint**: The outer loop operates through the same administrative gate as IMEM-POLICY. It cannot be triggered by any bus-connected component. A CU cannot request supervisor parameter changes via D-Bus any more than it can modify IMEM-SYS. The administrative channel is authenticated, rate-limited, and audited.
+
 ## Consequences
 
 ### Positive
