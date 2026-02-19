@@ -17,6 +17,14 @@ The SHA can be implemented as middleware sitting between the application layer a
 
 This is implementable today with existing LLM APIs, existing container runtimes, and conventional software engineering. The bus isolation is enforced by the middleware, not by the model.
 
+### 8.1.1 Isolation Boundaries and Honest Limitations
+
+The middleware approach provides **composition isolation**: the bus controller prevents untrusted data from being placed in the system prompt region of the API request, prevents tool outputs from overwriting skill definitions, and enforces capacity budgets per memory segment. These are real structural guarantees that eliminate common injection vectors.
+
+However, the model's self-attention mechanism still processes the entire composed context as a single token sequence. The middleware cannot prevent the model from being *influenced* by adversarial data content to deviate from its instructions within the allowed behavioral boundaries. This is the gap between "data cannot replace instructions" (guaranteed) and "data cannot influence reasoning about instructions" (not guaranteed at this tier).
+
+This limitation is inherent to any middleware-only approach. See [ADR-100](architecture/core/ADR-100-middleware-bus-isolation-boundaries.md) for the full three-tier isolation model and [ADR-300](architecture/security/ADR-300-cu-influence-mitigation-strategies.md) for strategies that address the influence gap within the middleware tier.
+
 ## 8.2 API-Level Enforcement (Medium-term)
 
 LLM API providers could offer architectural support for bus isolation:
