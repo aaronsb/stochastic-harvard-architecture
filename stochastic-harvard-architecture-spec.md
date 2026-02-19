@@ -67,49 +67,87 @@ The system defines three bus types with distinct access semantics:
 
 ### 2.3 System Diagram
 
-```
-              ┌─────────────────────────────────────────────────────────────┐
-              │                    INSTRUCTION MEMORY                       │
-              │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-              │  │  SYSTEM   │  │  SKILLS  │  │ POLICIES │  │ EXEC CTX │  │
-              │  │  PROMPT   │  │ (loaded) │  │ (rules)  │  │ (plans)  │  │
-              │  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
-              └──────────┬─────────────────────────────────────────────────┘
-                         │ I-BUS (isolated, read-only during execution)
-                         ▼
-              ┌─────────────────────────────────────────────────────────────┐
-              │                     CONTROL UNITS                           │
-              │                                                             │
-              │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-              │  │ LLM CORE │◄─►│DIFFUSION │◄─►│ CODE CU  │◄─►│SPEECH CU │  │
-              │  │ (reason) │  │ (image)  │  │ (code)   │  │ (voice)  │  │
-              │  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
-              │       X-BUS (dispatch between CUs)                         │
-              └──────┬──────────────────────────────────────────┬──────────┘
-                     │ D-BUS (shared, bidirectional)             │ X-BUS
-                     ▼                                           ▼
-              ┌─────────────────────┐                   ┌─────────────────┐
-              │     DATA MEMORY     │                   │   ALU / COMPUTE │
-              │  ┌───────┐┌───────┐ │                   │  ┌────┐ ┌────┐  │
-              │  │ FILES ││ CONV  │ │ ◄──── D-BUS ────► │  │EXEC│ │SRCH│  │
-              │  │       ││BUFFER │ │                   │  │    │ │    │  │
-              │  └───────┘└───────┘ │                   │  └────┘ └────┘  │
-              │  ┌───────┐┌───────┐ │                   │  ┌────┐ ┌────┐  │
-              │  │VECTOR ││ TEMP  │ │                   │  │MATH│ │LINT│  │
-              │  │ STORE ││SCRATCH│ │                   │  │    │ │    │  │
-              │  └───────┘└───────┘ │                   │  └────┘ └────┘  │
-              └─────────────────────┘                   └─────────────────┘
-                     │                                           │
-                     └──────────────────┬────────────────────────┘
-                                        │ D-BUS
-                                        ▼
-              ┌─────────────────────────────────────────────────────────────┐
-              │                      I/O CHANNELS                          │
-              │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-              │  │MESSAGING │  │   WEB    │  │   API    │  │ HARDWARE │  │
-              │  │(chat/sms)│  │(browser) │  │(external)│  │(sensors) │  │
-              │  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
-              └─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph IMEM["INSTRUCTION MEMORY"]
+        direction LR
+        SYS["System\nPrompt"]
+        SKILL["Skills\n(loaded)"]
+        POL["Policies\n(rules)"]
+        ECTX["Exec Ctx\n(plans)"]
+    end
+
+    subgraph CU["CONTROL UNITS"]
+        direction LR
+        LLM["LLM Core\n(reason)"]
+        DIFF["Diffusion\n(image)"]
+        CODE["Code CU\n(code)"]
+        SPEECH["Speech CU\n(voice)"]
+        LLM <-->|"X-Bus"| DIFF
+        DIFF <-->|"X-Bus"| CODE
+        CODE <-->|"X-Bus"| SPEECH
+    end
+
+    subgraph DMEM["DATA MEMORY"]
+        direction LR
+        FILES["Files"]
+        CONV["Conv\nBuffer"]
+        VEC["Vector\nStore"]
+        SCRATCH["Temp\nScratch"]
+    end
+
+    subgraph ALU["ALU / COMPUTE"]
+        direction LR
+        EXEC["Exec"]
+        SRCH["Search"]
+        MATH["Math"]
+        LINT["Lint"]
+    end
+
+    subgraph IO["I/O CHANNELS"]
+        direction LR
+        MSG["Messaging\n(chat/sms)"]
+        WEB["Web\n(browser)"]
+        API["API\n(external)"]
+        HW["Hardware\n(sensors)"]
+    end
+
+    IMEM -->|"I-Bus (isolated, read-only)"| CU
+    CU -->|"D-Bus (shared, bidirectional)"| DMEM
+    CU -->|"X-Bus (dispatch)"| ALU
+    DMEM <-->|"D-Bus"| ALU
+    DMEM -->|"D-Bus"| IO
+    ALU -->|"D-Bus"| IO
+
+    style IMEM fill:#2D7D9A,stroke:#4A5568,color:#FFFFFF
+    style SYS fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style SKILL fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style POL fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style ECTX fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+
+    style CU fill:#7B2D8E,stroke:#4A5568,color:#FFFFFF
+    style LLM fill:#7B2D8E,stroke:#FFFFFF,color:#FFFFFF
+    style DIFF fill:#7B2D8E,stroke:#FFFFFF,color:#FFFFFF
+    style CODE fill:#7B2D8E,stroke:#FFFFFF,color:#FFFFFF
+    style SPEECH fill:#7B2D8E,stroke:#FFFFFF,color:#FFFFFF
+
+    style DMEM fill:#2D8E5E,stroke:#4A5568,color:#FFFFFF
+    style FILES fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+    style CONV fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+    style VEC fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+    style SCRATCH fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+
+    style ALU fill:#5A6ABF,stroke:#4A5568,color:#FFFFFF
+    style EXEC fill:#5A6ABF,stroke:#FFFFFF,color:#FFFFFF
+    style SRCH fill:#5A6ABF,stroke:#FFFFFF,color:#FFFFFF
+    style MATH fill:#5A6ABF,stroke:#FFFFFF,color:#FFFFFF
+    style LINT fill:#5A6ABF,stroke:#FFFFFF,color:#FFFFFF
+
+    style IO fill:#C2572A,stroke:#4A5568,color:#FFFFFF
+    style MSG fill:#C2572A,stroke:#FFFFFF,color:#FFFFFF
+    style WEB fill:#C2572A,stroke:#FFFFFF,color:#FFFFFF
+    style API fill:#C2572A,stroke:#FFFFFF,color:#FFFFFF
+    style HW fill:#C2572A,stroke:#FFFFFF,color:#FFFFFF
 ```
 
 ---
@@ -143,15 +181,14 @@ A Control Unit is a stochastic inference engine. It is the architectural equival
 
 When a primary CU determines that a task requires a specialized CU, it issues a dispatch on the X-Bus containing:
 
-```
-DISPATCH {
-  target:      CU identifier or capability requirement
-  operation:   Structured description of the task
-  input_refs:  References to data memory segments (NOT inline data)
+```yaml
+DISPATCH:
+  target: CU identifier or capability requirement
+  operation: Structured description of the task
+  input_refs: References to data memory segments (NOT inline data)
   output_dest: Data memory segment for results
   constraints: Timeout, quality requirements, format requirements
-  context:     Minimal instruction context needed by the target CU
-}
+  context: Minimal instruction context needed by the target CU
 ```
 
 The target CU receives the dispatch, reads the referenced data from DMEM, optionally reads relevant instruction memory segments from IMEM (via its own I-Bus connection), performs inference, and writes results to the specified DMEM output location.
@@ -314,20 +351,42 @@ The bus controller is the **trusted computing base** of the architecture. Its co
 
 When a CU performs an inference cycle, its context window is composed from two separate buses:
 
-```
-CONTEXT WINDOW = [
-  --- I-BUS REGION (instruction memory) ---
-  IMEM-SYS:    system prompt, persona
-  IMEM-POLICY: active policies and constraints
-  IMEM-SKILL:  relevant loaded skills
-  IMEM-CTX:    current execution plan
-  --- SEPARATOR (architectural boundary marker) ---
-  --- D-BUS REGION (data memory) ---
-  DMEM-CONV:   conversation history
-  DMEM-TOOL:   recent tool outputs
-  DMEM-FILE:   referenced file contents
-  DMEM-SCRATCH: working memory
-]
+```mermaid
+flowchart TD
+    subgraph CTX["CONTEXT WINDOW"]
+        direction TB
+        subgraph IBUS["I-BUS REGION (instruction memory)"]
+            direction TB
+            IS["IMEM-SYS: system prompt, persona"]
+            IP["IMEM-POLICY: active policies and constraints"]
+            ISK["IMEM-SKILL: relevant loaded skills"]
+            IC["IMEM-CTX: current execution plan"]
+            IS --- IP --- ISK --- IC
+        end
+        SEP["--- ARCHITECTURAL BOUNDARY ---"]
+        subgraph DBUS["D-BUS REGION (data memory)"]
+            direction TB
+            DC["DMEM-CONV: conversation history"]
+            DT["DMEM-TOOL: recent tool outputs"]
+            DF["DMEM-FILE: referenced file contents"]
+            DS["DMEM-SCRATCH: working memory"]
+            DC --- DT --- DF --- DS
+        end
+        IBUS --- SEP --- DBUS
+    end
+
+    style CTX fill:none,stroke:#4A5568,stroke-width:2px,color:#FFFFFF
+    style IBUS fill:#2D7D9A,stroke:#4A5568,color:#FFFFFF
+    style IS fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style IP fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style ISK fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style IC fill:#2D7D9A,stroke:#FFFFFF,color:#FFFFFF
+    style SEP fill:#8E6B2D,stroke:#4A5568,color:#FFFFFF,stroke-dasharray:5 5
+    style DBUS fill:#2D8E5E,stroke:#4A5568,color:#FFFFFF
+    style DC fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+    style DT fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+    style DF fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
+    style DS fill:#2D8E5E,stroke:#FFFFFF,color:#FFFFFF
 ```
 
 The bus controller composes this context window before each inference call. The I-Bus and D-Bus regions are assembled **separately** and concatenated with an architectural boundary. The CU (model) sees both regions but the boundary is enforced **below the model** — even if the model is confused about which region is which, the bus controller's composition logic is deterministic and cannot be manipulated by content in either region.
@@ -361,16 +420,45 @@ A traditional CPU executes billions of instructions per second, each taking nano
 
 #### 5.1.1 Cycle Anatomy
 
-```
-1. FETCH:     Bus controller composes context window from IMEM (I-Bus) + DMEM (D-Bus)
-2. DECODE:    CU receives composed context (implicit — the model processes the input)
-3. EXECUTE:   CU produces output (reasoning, dispatch commands, responses)
-4. DISPATCH:  Output is parsed into:
-              - D-Bus writes (responses → DMEM-CONV, plans → IMEM-CTX)
-              - X-Bus dispatches (tool calls → ALU, sub-tasks → other CUs)
-              - I/O dispatches (messages → I/O-MSG, web requests → I/O-WEB)
-5. WRITEBACK: Results from dispatched operations return via D-Bus → DMEM
-6. REPEAT:    Next cycle begins with updated DMEM state
+```mermaid
+sequenceDiagram
+    participant BC as Bus Controller
+    participant CU as Control Unit
+    participant ALU as ALU / I/O
+    participant DMEM as Data Memory
+
+    rect rgba(45, 125, 154, 0.15)
+        Note over BC,DMEM: 1. FETCH
+        BC->>BC: Compose context window from IMEM (I-Bus) + DMEM (D-Bus)
+    end
+
+    rect rgba(123, 45, 142, 0.15)
+        Note over BC,CU: 2. DECODE
+        BC->>CU: Deliver composed context
+        CU->>CU: Process input (implicit)
+    end
+
+    rect rgba(123, 45, 142, 0.15)
+        Note over CU: 3. EXECUTE
+        CU->>CU: Produce output (reasoning, dispatch commands, responses)
+    end
+
+    rect rgba(90, 106, 191, 0.15)
+        Note over CU,ALU: 4. DISPATCH
+        CU->>DMEM: D-Bus writes (responses → DMEM-CONV, plans → IMEM-CTX)
+        CU->>ALU: X-Bus dispatches (tool calls → ALU, sub-tasks → other CUs)
+        CU->>ALU: I/O dispatches (messages → I/O-MSG, web requests → I/O-WEB)
+    end
+
+    rect rgba(45, 142, 94, 0.15)
+        Note over ALU,DMEM: 5. WRITEBACK
+        ALU->>DMEM: Results return via D-Bus
+    end
+
+    rect rgba(142, 107, 45, 0.15)
+        Note over BC,DMEM: 6. REPEAT
+        DMEM-->>BC: Next cycle begins with updated DMEM state
+    end
 ```
 
 #### 5.1.2 Cycle Scheduling
@@ -474,15 +562,14 @@ This routing decision can itself be made by a small, fast CU (a "scheduler CU") 
 
 Not all CUs need access to all memory segments or I/O channels:
 
-```
-                    IMEM-SYS  IMEM-SKILL  IMEM-CTX  DMEM-FILE  DMEM-CONV  I/O-MSG
-LLM Core (primary)     R          R           RW         R          R         RW
-LLM Core (small)       R          -           R          R          R         -
-Diffusion Core         -          R*          -          R          -         -
-Code Core              R          R           R          RW         R         -
-Speech Core            -          R*          -          -          R         RW
-Embedding Core         -          -           -          R          R         -
-```
+| CU Type | IMEM-SYS | IMEM-SKILL | IMEM-CTX | DMEM-FILE | DMEM-CONV | I/O-MSG |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **LLM Core (primary)** | R | R | RW | R | R | RW |
+| **LLM Core (small)** | R | - | R | R | R | - |
+| **Diffusion Core** | - | R* | - | R | - | - |
+| **Code Core** | R | R | R | RW | R | - |
+| **Speech Core** | - | R* | - | - | R | RW |
+| **Embedding Core** | - | - | - | R | R | - |
 
 `R*` = reads only the subset of IMEM-SKILL relevant to this CU's specialization.
 
