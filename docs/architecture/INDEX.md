@@ -21,6 +21,7 @@ _Fundamental SHA components, bus architecture, memory model_
 | ADR | Title | Status |
 |-----|-------|--------|
 | [ADR-100](./core/ADR-100-middleware-bus-isolation-boundaries.md) | Middleware Bus Isolation Boundaries | Draft |
+| [ADR-101](./core/ADR-101-multi-instance-peer-supervision-topology.md) | Multi-Instance Peer Supervision Topology | Draft |
 
 ## Bus Protocols
 _I-Bus, D-Bus, X-Bus protocol design, bus controller, verification gates_
